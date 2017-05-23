@@ -143,7 +143,10 @@ $nameDB = array(
     "datawarehouse" => "test_datawarehouse",
 );
 
-// Lets pick one of them
+
+
+//TEST
+//// Lets pick one of them
 
 try {
 $db = new PDO('mysql:host=localhost;dbname='.$nameDB['datawarehouse']. ';charset=utf8', 'root', 'root');
