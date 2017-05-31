@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Brava Fab</title>
+    <title>Brava Fabrics</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -26,7 +26,6 @@
 
     <!-- Theme CSS -->
     <link href="css/new-age.min.css" rel="stylesheet">
-
 
 </head>
 
@@ -45,13 +44,10 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a class="page-scroll" href="#download">Intro</a>
+                        <a class="page-scroll" href="#all">All</a>
                     </li>
                     <li>
-                        <a class="page-scroll" href="#features">Prestashop</a>
-                    </li>
-                    <li>
-                        <a class="page-scroll" href="#datawarehouse">Datawarehouse</a>
+                        <a class="page-scroll" href="#details">Details</a>
                     </li>
                 </ul>
             </div>
@@ -60,137 +56,356 @@
         <!-- /.container-fluid -->
     </nav>
 
+<?php 
+$set_local_time = new DateTimeZone("Europe/Madrid"); // Lets Set the timezone (Europe)
+$now = new DateTime(date("Y-m-d"), $set_local_time);
+$now_minus_one_year = date('Y-m-d',strtotime(date($now->format("d-m-Y"), mktime()) . " - 365 day"));
+$now_begin_month_one_year = date('Y-m-d',strtotime(date($now->format("01-m-Y"), mktime()) . " - 365 day"));
+$begin_of_the_current_month = $now->format("Y-m-01");
 
-    <section id="intro" class="download bg-primary text-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <h2 class="section-heading">Statistics about Database</h2>
-                    <p>You can visit the website : <a href="https://bravafabrics.com" target="_blank">BravaFabrics</a> !</p>
-                </div>
-            </div>
-        </div>
-    </section>
+// ******** TO HAVE THE REVIEW OF TODAY'S DATE, JUST UNCOMMENT THE FILES ***** //
 
-    <section id="prestashop" class="features">
+// List of each countries by date
+include("queries_database.php");
+$yesterday_date = new DateTime(date("Y-m-d"), $set_local_time); // Today's date !
+$yesterday_date->modify('-1 day');
+
+$today_date = $yesterday_date->format("Y-m-d");
+//$today_date = "2017-05-05";
+//$month_begin = "2017-05-01";
+ $month_begin = $yesterday_date->format("Y-m-01"); // Beginning of the month
+//$year_date_begin = "2016-05-01";
+ $year_date_end_temp = date('Y-m-d',strtotime(date($yesterday_date->format("d-m-Y"), mktime()) . " - 365 day"));
+$test_year = new DateTime($year_date_end_temp);
+$test_year->modify('-1 day');
+$test_year->modify('+1 day');
+$year_date_end = $test_year->format("Y-m-d"); 
+ // Lets try the +1 et -1 thing 
+ 
+ 
+
+$countries = get_countries_top_five($today_date);
+
+?>
+    <section id="all" class="features" style="padding-top:75px;">
         <div class="container">
                     <div class="section-heading" style="text-align:center;margin-bottom:20px;">
-                        <h2>Prestashop</h2>
-						<i class="icon-lock-open text-primary" style="font-size:60px;"></i>
-                        <p class="text-muted">Check out the datas we get about Prestashop Database !</p>
-
-            </div>
-<!--
-		 <table class="table">
+                        <h2>Report from yesterday : <b><?php echo $yesterday_date->format("d-m-Y"); ?></b></h2>
+						</div>
+<p style="font-size:25px;text-align:center;"><img src="img/flags/europeanunion.png" /> <u>All Countries</u></p>
+<div class="text-table">
+		 <table class="table table-hover" style="text-align:center;">
     <thead>
-      <tr >
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>Email</th>
+      <tr bgcolor="#e8e8e8">
+        <th style="text-align:right;border-right:1px solid #000000;"></th>
+        <th style="text-align:right;border-right:1px solid #000000;">Yesterday</th>
+		<th style="text-align:right;border-right:3px solid #000000;">%</th>
+        <th style="text-align:right;border-right:1px solid #000000;">This month</th>
+		<th style="text-align:right;border-right:3px solid #000000;">%</th>
+		<th style="text-align:right;border-right:1px solid #000000;">Last year</th>
+		<th style="text-align:right;">%</th>		
       </tr>
     </thead>
-    <tbody>
+    <tbody style="text-align:right;">
       <tr>
-        <td>Default</td>
-        <td>Defaultson</td>
-        <td>def@somemail.com</td>
-      </tr>      
+        <td style="border-right:1px solid #000000;"><b>Sales</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_fullpricing($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_fullpricing_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_fullpricing($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_fullpricing($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>-</b></td>		
+      </tr>  
       <tr>
-        <td>Success</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr class="danger">
-        <td>Danger</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr class="info">
-        <td>Info</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
-      </tr>
-      <tr class="warning">
-        <td>Warning</td>
-        <td>Refs</td>
-        <td>bo@example.com</td>
-      </tr>
+        <td style="border-right:1px solid #000000;"><b>Discount</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_discount($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_discount_from_total($today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_discount_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_discount_between_two_dates_from_total($month_begin, $today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_discount($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_discount($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_discount($year_date_end, ''))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_discount_from_total($year_date_end, '') . " %";  } ?>		
+		</b></td>
+      </tr> 	  
+
+      <tr>
+        <td style="border-right:1px solid #000000;"><b>Net Sales</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;">-</td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_net_sales($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_net_sales($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>
+		-
+		</b></td>
+      </tr> 	  
       <tr class="active">
-        <td>Active</td>
-        <td>Activeson</td>
-        <td>act@example.com</td>
-      </tr>
+        <td style="border-right:1px solid #000000;"><b>Shipping</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_shipping_paid($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_shipping_paid($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>	
+      <tr class="active">
+        <td style="border-right:1px solid #000000;"><b>Cogs</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_cogs($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_cogs_from_total($today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_cogs_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_cogs_between_two_dates_from_total($month_begin, $today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_cogs($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_cogs($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_cogs($year_date_end, ''))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_cogs_from_total($year_date_end, '') . " %";  } ?>		
+		</b></td>	
+
+      </tr>	  
+      <tr>
+        <td style="border-right:1px solid #000000;"><b>Profit</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_profit($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_profit_from_total($today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_profit_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_profit_between_two_dates_from_total($month_begin, $today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_profit($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_profit($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_profit($year_date_end, ''))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_profit_from_total($year_date_end, '') . " %";  } ?>		
+		</b></td>
+      </tr> 	  
     </tbody>
   </table>
+  </div>
+     <div id="chart_all_countries" style="width: 100%;min-height: 450px;"></div>
 
--->
+  </div>
+  </section>
+
+    <section id="details" class="features">
+        <div class="container">  
+<?php
+foreach($countries as $country) {
+?>
+<div id="country-<?php echo $country['countrycode']; ?>">
+<p style="font-size:25px;text-align:center;"><img src="img/flags/<?php echo strtolower($country['countrycode']); ?>.png" /> <u><?php echo $country['countrycode']; ?></u></p>
+<div class="text-table">
+		 <table class="table table-hover" style="text-align:center;">
+    <thead>
+      <tr bgcolor="#e8e8e8">
+        <th style="text-align:right;border-right:1px solid #000000;"></th>
+        <th style="text-align:right;border-right:1px solid #000000;">Yesterday</th>
+		<th style="text-align:right;border-right:3px solid #000000;">%</th>
+        <th style="text-align:right;border-right:1px solid #000000;">This month</th>
+		<th style="text-align:right;border-right:3px solid #000000;">%</th>
+		<th style="text-align:right;border-right:1px solid #000000;">Last year</th>
+		<th style="text-align:right;">%</th>		
+      </tr>
+    </thead>
+    <tbody style="text-align:right;">
+      <tr>
+        <td style="border-right:1px solid #000000;"><b>Sales</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_fullpricing($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_fullpricing_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_fullpricing($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_fullpricing($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>-</b></td>		
+      </tr>  
+      <tr>
+        <td style="border-right:1px solid #000000;"><b>Discount</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_discount($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_discount_from_total($today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_discount_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_discount_between_two_dates_from_total($month_begin, $today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_discount($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_discount($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_discount($year_date_end, $country['countrycode']))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_discount_from_total($year_date_end, $country['countrycode']) . " %";  } ?>		
+		</b></td>
+      </tr> 	  
+
+      <tr>
+        <td style="border-right:1px solid #000000;"><b>Net Sales</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;">-</td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_net_sales($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_net_sales($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>
+		-
+		</b></td>
+      </tr> 	  
+      <tr class="active">
+        <td style="border-right:1px solid #000000;"><b>Shipping</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_shipping_paid($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_shipping_paid($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>	
+      <tr class="active">
+        <td style="border-right:1px solid #000000;"><b>Cogs</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_cogs($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_cogs_from_total($today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_cogs_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_cogs_between_two_dates_from_total($month_begin, $today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_cogs($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_cogs($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_cogs($year_date_end, $country['countrycode']))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_cogs_from_total($year_date_end, $country['countrycode']) . " %";  } ?>		
+		</b></td>	
+
+      </tr>	  
+      <tr>
+        <td style="border-right:1px solid #000000;"><b>Profit</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_profit($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_profit_from_total($today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_profit_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_profit_between_two_dates_from_total($month_begin, $today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_profit($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_profit($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_profit($year_date_end, $country['countrycode']))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_profit_from_total($year_date_end, $country['countrycode']) . " %";  } ?>		
+		</b></td>
+      </tr> 	  
+    </tbody>
+  </table>
+</div>
+</div>
+<div id="chart_country_<?php echo $country['countrycode']; ?>"></div>
+<?php
+}
+?>
+					
+						
+<!-- Be careful about the responsive thing -> Doesn't work ! -->
+						
+			
+			</div>
+
   
         </div>
     </section>
 
 
-    <section id="datawarehouse" class="contact bg-primary">
-        <div class="container">
-                    <div class="section-heading" style="text-align:center;margin-bottom:20px;">
-                        <h2>Dataware House</h2>
-                        <p class="text-muted">Check out the datas we get about Datawarehouse Database !</p>
-
-            </div>
-<?php
-/* --- CONNECTION ON THE MYSQL DATABASE */
-$nameDB = array(
-    "prestashop" => "test_prestashop",
-    "datawarehouse" => "test_datawarehouse",
-);
-
-
-
-//TEST
-//// Lets pick one of them
-
-try {
-$db = new PDO('mysql:host=localhost;dbname='.$nameDB['datawarehouse']. ';charset=utf8', 'root', 'root');
-}
-
-catch(Exception $e) {
-	die('Special error :' . $e->getMessage());
-} // and show if there is a particular problem.
-
-// About cogs
-$first_query = $db->query('SELECT * FROM cogs_ecommerce');
-$amount_cogs = 0;
-while ($datas = $first_query->fetch()) $amount_cogs+= $datas['cogs'];
-
-// About facebook spend
-$first_query = $db->query('SELECT * FROM facebook_spend');
-$amount_fb = 0;
-while ($datas = $first_query->fetch()) $amount_fb += $datas['spend'];
-
-// About gateway spend 
-// About facebook spend
-$first_query = $db->query('SELECT * FROM gateway_spend');
-$amount_gt = 0;
-while ($datas = $first_query->fetch()) $amount_gt += $datas['spend'];
-
-?>
-
-<div class="list-group">
-  <p class="list-group-item active">Cogs Total Amount : <?php echo $amount_cogs; ?> euros</a>
-  <p class="list-group-item" style="color:#000000;">Facebook Total amount : <?php echo $amount_fb; ?> euros</a>
-  <p class="list-group-item active">Gateway Total amount : <?php echo $amount_gt; ?> euros</a>
-</div>  
-        </div>
-    </section>
-
     <footer>
         <div class="container">
-            <p>&copy; 2016 BravaFabrics & Bootstrap Template All Rights Reserved.</p>
+            <p>&copy; 2017 BravaFabrics & Bootstrap Template All Rights Reserved.</p>
         </div>
     </footer>
 
-    <!-- jQuery -->
-    <script src="lib/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript">
+    
+    google.load('visualization', '1', {'packages':['corechart']});
 
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.setOnLoadCallback(drawChart);
+      
+    function drawChart() {
+		<?php
+date_default_timezone_set("Europe/Madrid");		
+$date_begin_correct_format = new DateTime($today_date, $set_local_time);
+$date_end_correct_format = date('d-m-Y',strtotime(date($date_begin_correct_format->format("Y-m-d"), mktime()) . " - 6 day"));
+$date_begin_to_show = $date_begin_correct_format->format("d-m-Y");
+$date_begin_correct_format = new DateTime($date_end_correct_format, $set_local_time); 
+?>
+            var data_all_countries = google.visualization.arrayToDataTable([
+          ['Day', 'Sales', 'Profit', 'Marketing Cost'],
+		  <?php
+
+for ($day_to_add = 0; $day_to_add < 7; $day_to_add++) {
+	$date_to_implement = date('Y-m-d',strtotime(date($date_begin_correct_format->format("Y-m-d"), mktime()) . " + ".$day_to_add . " day"));
+		$sales = get_fullpricing($date_to_implement, '');
+		$profit = get_profit($date_to_implement, '');
+		echo "['".date('D',strtotime($date_to_implement)). "', ".$sales.", ".$profit.", 0],";
+}
+
+		  ?>
+        ]);
+        var options_all_countries = {
+          title: 'All Countries Report from <?php echo $date_begin_correct_format->format("d-m-Y") . " to " .$date_begin_to_show; ?>',
+          curveType: 'function',
+		  legend: { position: 'top', alignment: 'start' }}
+      var chart = new google.visualization.LineChart(document.getElementById('chart_all_countries'));
+      chart.draw(data_all_countries, options_all_countries);
+
+// Now lets plot for each the countries
+<?php 
+$countries = get_countries_top_five($today_date);
+foreach($countries as $country) {
+
+?>
+            var data_each_country = google.visualization.arrayToDataTable([
+          ['Day', 'Sales', 'Profit', 'Marketing Cost'],
+		  <?php
+
+for ($day_to_add = 0; $day_to_add < 7; $day_to_add++) {
+	$date_to_implement = date('Y-m-d',strtotime(date($date_begin_correct_format->format("Y-m-d"), mktime()) . " + ".$day_to_add . " day"));
+		$sales = get_fullpricing($date_to_implement, $country['countrycode']);
+		$profit = get_profit($date_to_implement, $country['countrycode']);
+		echo "['".date('D',strtotime($date_to_implement)). "', ".$sales.", ".$profit.", 0],";
+}
+
+		  ?>
+        ]);
+        var options_each_country = {
+          title: 'Report for the country <?php echo $country['countrycode']; ?> from <?php echo $date_begin_correct_format->format("d-m-Y") . " to " .$date_begin_to_show; ?>',
+          curveType: 'function',
+		  legend: { position: 'top', alignment: 'start' }}
+      var chart = new google.visualization.LineChart(document.getElementById('chart_country_<?php echo $country['countrycode']; ?>'));
+      chart.draw(data_each_country, options_each_country);
+
+<?php }
+?>
+// 	End of the ploting
+	  
+	  
+    } 
+$(window).resize(function(){
+  drawChart();
+});	
+
+    </script>
+
+	<!-- END ploting -->
     <!-- Bootstrap Core JavaScript -->
     <script src="lib/bootstrap/js/bootstrap.min.js"></script>
 
