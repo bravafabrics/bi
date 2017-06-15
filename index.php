@@ -37,7 +37,7 @@
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand page-scroll" href="#page-top"><img src="img/bflogo.jpg" /></a>
+                <a class="navbar-brand page-scroll" href="#page-top"><img src="img/bflogo.jpg" style="width:50%;" /></a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -49,6 +49,9 @@
                     <li>
                         <a class="page-scroll" href="#details">Details</a>
                     </li>
+                    <li>
+                        <a class="page-scroll" href="cost.php">Gateways/Logistics</a>
+                    </li>					
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -57,10 +60,11 @@
     </nav>
 
 <?php 
+date_default_timezone_set("Europe/Madrid");		
 $set_local_time = new DateTimeZone("Europe/Madrid"); // Lets Set the timezone (Europe)
 $now = new DateTime(date("Y-m-d"), $set_local_time);
-$now_minus_one_year = date('Y-m-d',strtotime(date($now->format("d-m-Y"), mktime()) . " - 365 day"));
-$now_begin_month_one_year = date('Y-m-d',strtotime(date($now->format("01-m-Y"), mktime()) . " - 365 day"));
+$now_minus_one_year = date('Y-m-d',strtotime(date($now->format("d-m-Y"), time()) . " - 365 day"));
+$now_begin_month_one_year = date('Y-m-d',strtotime(date($now->format("01-m-Y"), time()) . " - 365 day"));
 $begin_of_the_current_month = $now->format("Y-m-01");
 
 // ******** TO HAVE THE REVIEW OF TODAY'S DATE, JUST UNCOMMENT THE FILES ***** //
@@ -70,16 +74,17 @@ include("queries_database.php");
 $yesterday_date = new DateTime(date("Y-m-d"), $set_local_time); // Today's date !
 $yesterday_date->modify('-1 day');
 
-$today_date = $yesterday_date->format("Y-m-d");
-//$today_date = "2017-05-05";
-//$month_begin = "2017-05-01";
- $month_begin = $yesterday_date->format("Y-m-01"); // Beginning of the month
-//$year_date_begin = "2016-05-01";
- $year_date_end_temp = date('Y-m-d',strtotime(date($yesterday_date->format("d-m-Y"), mktime()) . " - 365 day"));
+// $today_date = $yesterday_date->format("Y-m-d");
+$today_date = "2017-05-05";
+$month_begin = "2017-05-01";
+// $month_begin = $yesterday_date->format("Y-m-01"); // Beginning of the month
+$year_date_begin = "2016-05-01";
+ $year_date_end_temp = date('Y-m-d',strtotime(date($yesterday_date->format("d-m-Y"), time()) . " - 365 day"));
 $test_year = new DateTime($year_date_end_temp);
 $test_year->modify('-1 day');
 $test_year->modify('+1 day');
-$year_date_end = $test_year->format("Y-m-d"); 
+// $year_date_end = $test_year->format("Y-m-d"); 
+$year_date_end = "2016-05-01";
  // Lets try the +1 et -1 thing 
  
  
@@ -96,7 +101,7 @@ $countries = get_countries_top_five($today_date);
 <div class="text-table">
 		 <table class="table table-hover" style="text-align:center;">
     <thead>
-      <tr bgcolor="#e8e8e8">
+      <tr class="active">
         <th style="text-align:right;border-right:1px solid #000000;"></th>
         <th style="text-align:right;border-right:1px solid #000000;">Yesterday</th>
 		<th style="text-align:right;border-right:3px solid #000000;">%</th>
@@ -107,8 +112,8 @@ $countries = get_countries_top_five($today_date);
       </tr>
     </thead>
     <tbody style="text-align:right;">
-      <tr>
-        <td style="border-right:1px solid #000000;"><b>Sales</b></td>
+      <tr id="0_all_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Fullpricing</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_fullpricing($today_date, ''); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b>-</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_fullpricing_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
@@ -118,7 +123,7 @@ $countries = get_countries_top_five($today_date);
 		echo get_fullpricing($year_date_end, '') . " €";  } ?></b></td>
 		<td><b>-</b></td>		
       </tr>  
-      <tr>
+      <tr id="1_all_country" style="display:none;">
         <td style="border-right:1px solid #000000;"><b>Discount</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_discount($today_date, ''); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_discount_from_total($today_date, ''); ?> %</b></td>
@@ -134,8 +139,8 @@ $countries = get_countries_top_five($today_date);
 		</b></td>
       </tr> 	  
 
-      <tr>
-        <td style="border-right:1px solid #000000;"><b>Net Sales</b></td>
+      <tr class="active">
+        <td style="border-right:1px solid #000000;"><img src="img/icon/more.png" id="more_all_net_sales" style="float:left;" />  <b>Net Sales</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales($today_date, ''); ?> €</b></td>
 		<td style="border-right:3px solid #000000;">-</td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
@@ -146,9 +151,25 @@ $countries = get_countries_top_five($today_date);
 		<td><b>
 		-
 		</b></td>
-      </tr> 	  
+      </tr> 
       <tr class="active">
-        <td style="border-right:1px solid #000000;"><b>Shipping</b></td>
+        <td style="border-right:1px solid #000000;"><b>Gateways</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_gateways($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_gateways_from_total($today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_gateways_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_gateways_between_two_dates_from_total($month_begin, $today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_gateways($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_gateways($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_gateways($year_date_end, ''))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_gateways_from_total($year_date_end, '') . " %";  } ?>		
+		</b></td>	
+
+      </tr>	 
+      <tr id="3_all_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Shipping Paid</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid($today_date, ''); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b>-</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
@@ -160,7 +181,62 @@ $countries = get_countries_top_five($today_date);
 		</b></td>
 
       </tr>	
+      <tr id="4_all_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Shipping Logistic</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_logistics($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_logistics_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_shipping_logistics($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_shipping_logistics($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>		
+      <tr id="4_all_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Handling Cost</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_handling_cost($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_handling_cost_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_handling_cost($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_handling_cost($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>	
+      <tr id="5_all_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Order Preparation</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_order_preparation($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_order_preparation_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_order_preparation($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_order_preparation($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>	
+
       <tr class="active">
+        <td style="border-right:1px solid #000000;"><img src="img/icon/more.png" id="more_all_logs" style="float:left;" />  <b>Total Logistics</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_logs($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_logs_from_total($today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_logs_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_logs_between_two_dates_from_total($month_begin, $today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_total_logs($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_total_logs($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_total_logs($year_date_end, ''))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_logs_from_total($year_date_end, '') . " %";  } ?>		
+		</b></td>	
+      </tr> 	  
+      <tr id="6_all_country" style="display:none;">
         <td style="border-right:1px solid #000000;"><b>Cogs</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_cogs($today_date, ''); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_cogs_from_total($today_date, ''); ?> %</b></td>
@@ -175,7 +251,55 @@ $countries = get_countries_top_five($today_date);
 		echo get_percentage_cogs_from_total($year_date_end, '') . " %";  } ?>		
 		</b></td>	
 
-      </tr>	  
+      </tr>	
+	  
+      <tr id="7_all_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Packaging Cost</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_packaging_cost($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_packaging_cost_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_packaging_cost($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_packaging_cost($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>
+
+	  
+      <tr id="8_all_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Shipping Materals</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_materals($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_materals_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_shipping_materals($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_shipping_materals($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>			  
+	  
+      <tr class="active">
+        <td style="border-right:1px solid #000000;"><img src="img/icon/more.png" id="more_all_cogs"  style="float:left;"/>  <b>Total Cogs</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_cogs($today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_total_cogs_from_total($today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_cogs_between_two_dates($month_begin, $today_date, ''); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_total_cogs_between_two_dates_from_total($month_begin, $today_date, ''); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_total_cogs($year_date_end, ''))) { echo "<i>0</i>"; }
+		else {
+		echo get_total_cogs($year_date_end, '') . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_total_cogs($year_date_end, ''))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_total_cogs_from_total($year_date_end, '') . " %";  } ?>		
+		</b></td>	
+      </tr> 	  
+ 
+
+	  
       <tr>
         <td style="border-right:1px solid #000000;"><b>Profit</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_profit($today_date, ''); ?> €</b></td>
@@ -209,7 +333,7 @@ foreach($countries as $country) {
 <div class="text-table">
 		 <table class="table table-hover" style="text-align:center;">
     <thead>
-      <tr bgcolor="#e8e8e8">
+      <tr class="active">
         <th style="text-align:right;border-right:1px solid #000000;"></th>
         <th style="text-align:right;border-right:1px solid #000000;">Yesterday</th>
 		<th style="text-align:right;border-right:3px solid #000000;">%</th>
@@ -220,7 +344,7 @@ foreach($countries as $country) {
       </tr>
     </thead>
     <tbody style="text-align:right;">
-      <tr>
+      <tr id="0_<?php echo $country['countrycode']; ?>_country" style="display:none;">
         <td style="border-right:1px solid #000000;"><b>Sales</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_fullpricing($today_date, $country['countrycode']); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b>-</b></td>
@@ -231,7 +355,7 @@ foreach($countries as $country) {
 		echo get_fullpricing($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
 		<td><b>-</b></td>		
       </tr>  
-      <tr>
+      <tr id="1_<?php echo $country['countrycode']; ?>_country" style="display:none;">
         <td style="border-right:1px solid #000000;"><b>Discount</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_discount($today_date, $country['countrycode']); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_discount_from_total($today_date, $country['countrycode']); ?> %</b></td>
@@ -247,8 +371,8 @@ foreach($countries as $country) {
 		</b></td>
       </tr> 	  
 
-      <tr>
-        <td style="border-right:1px solid #000000;"><b>Net Sales</b></td>
+      <tr class="active">
+        <td style="border-right:1px solid #000000;"><img src="img/icon/more.png" id="more_<?php echo $country['countrycode']; ?>_net_sales" style="float:left;" />  <b>Net Sales</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales($today_date, $country['countrycode']); ?> €</b></td>
 		<td style="border-right:3px solid #000000;">-</td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_net_sales_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
@@ -259,9 +383,25 @@ foreach($countries as $country) {
 		<td><b>
 		-
 		</b></td>
-      </tr> 	  
+      </tr> 
       <tr class="active">
-        <td style="border-right:1px solid #000000;"><b>Shipping</b></td>
+        <td style="border-right:1px solid #000000;"><b>Gateways</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_gateways($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_gateways_from_total($today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_gateways_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_gateways_between_two_dates_from_total($month_begin, $today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_gateways($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_gateways($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_gateways($year_date_end, $country['countrycode']))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_gateways_from_total($year_date_end, $country['countrycode']) . " %";  } ?>		
+		</b></td>	
+
+      </tr>	 	  
+      <tr id="3_<?php echo $country['countrycode']; ?>_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Shipping Paid</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid($today_date, $country['countrycode']); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b>-</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_paid_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
@@ -273,7 +413,62 @@ foreach($countries as $country) {
 		</b></td>
 
       </tr>	
+      <tr id="4_<?php echo $country['countrycode']; ?>_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Shipping Logistic</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_logistics($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_logistics_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_shipping_logistics($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_shipping_logistics($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>		
+      <tr id="4_<?php echo $country['countrycode']; ?>_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Handling Cost</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_handling_cost($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_handling_cost_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_handling_cost($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_handling_cost($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>	
+      <tr id="5_<?php echo $country['countrycode']; ?>_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Order Preparation</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_order_preparation($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_order_preparation_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_order_preparation($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_order_preparation($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>	
+
       <tr class="active">
+        <td style="border-right:1px solid #000000;"><img src="img/icon/more.png" id="more_<?php echo $country['countrycode']; ?>_logs" style="float:left;" />  <b>Total Logistics</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_logs($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_logs_from_total($today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_logs_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_logs_between_two_dates_from_total($month_begin, $today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_total_logs($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_total_logs($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_total_logs($year_date_end, $country['countrycode']))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_logs_from_total($year_date_end, $country['countrycode']) . " %";  } ?>		
+		</b></td>	
+      </tr> 	  
+      <tr id="6_<?php echo $country['countrycode']; ?>_country" style="display:none;">
         <td style="border-right:1px solid #000000;"><b>Cogs</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_cogs($today_date, $country['countrycode']); ?> €</b></td>
 		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_cogs_from_total($today_date, $country['countrycode']); ?> %</b></td>
@@ -288,7 +483,55 @@ foreach($countries as $country) {
 		echo get_percentage_cogs_from_total($year_date_end, $country['countrycode']) . " %";  } ?>		
 		</b></td>	
 
-      </tr>	  
+      </tr>	
+	  
+      <tr id="7_<?php echo $country['countrycode']; ?>_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Packaging Cost</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_packaging_cost($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_packaging_cost_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_packaging_cost($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_packaging_cost($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>
+
+	  
+      <tr id="8_<?php echo $country['countrycode']; ?>_country" style="display:none;">
+        <td style="border-right:1px solid #000000;"><b>Shipping Materals</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_materals($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_shipping_materals_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b>-</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_shipping_materals($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_shipping_materals($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>-	
+		</b></td>
+
+      </tr>			  
+	  
+      <tr class="active">
+        <td style="border-right:1px solid #000000;"><img src="img/icon/more.png" id="more_<?php echo $country['countrycode']; ?>_cogs"  style="float:left;"/>  <b>Total Cogs</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_cogs($today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_total_cogs_from_total($today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php echo get_total_cogs_between_two_dates($month_begin, $today_date, $country['countrycode']); ?> €</b></td>
+		<td style="border-right:3px solid #000000;"><b><?php echo get_percentage_total_cogs_between_two_dates_from_total($month_begin, $today_date, $country['countrycode']); ?> %</b></td>
+		<td style="border-right:1px solid #000000;"><b><?php if(empty(get_total_cogs($year_date_end, $country['countrycode']))) { echo "<i>0</i>"; }
+		else {
+		echo get_total_cogs($year_date_end, $country['countrycode']) . " €";  } ?></b></td>
+		<td><b>
+<?php if(empty(get_total_cogs($year_date_end, $country['countrycode']))) { echo "<i>-</i>"; }
+		else {
+		echo get_percentage_total_cogs_from_total($year_date_end, $country['countrycode']) . " %";  } ?>		
+		</b></td>	
+      </tr> 	  
+ 
+
+	  
       <tr>
         <td style="border-right:1px solid #000000;"><b>Profit</b></td>
 		<td style="border-right:1px solid #000000;"><b><?php echo get_profit($today_date, $country['countrycode']); ?> €</b></td>
@@ -314,13 +557,12 @@ foreach($countries as $country) {
 ?>
 					
 						
-<!-- Be careful about the responsive thing -> Doesn't work ! -->
 						
 			
 			</div>
 
   
-        </div>
+        </div>	
     </section>
 
 
@@ -343,7 +585,7 @@ foreach($countries as $country) {
 		<?php
 date_default_timezone_set("Europe/Madrid");		
 $date_begin_correct_format = new DateTime($today_date, $set_local_time);
-$date_end_correct_format = date('d-m-Y',strtotime(date($date_begin_correct_format->format("Y-m-d"), mktime()) . " - 6 day"));
+$date_end_correct_format = date('d-m-Y',strtotime(date($date_begin_correct_format->format("Y-m-d"), time()) . " - 6 day"));
 $date_begin_to_show = $date_begin_correct_format->format("d-m-Y");
 $date_begin_correct_format = new DateTime($date_end_correct_format, $set_local_time); 
 ?>
@@ -352,7 +594,7 @@ $date_begin_correct_format = new DateTime($date_end_correct_format, $set_local_t
 		  <?php
 
 for ($day_to_add = 0; $day_to_add < 7; $day_to_add++) {
-	$date_to_implement = date('Y-m-d',strtotime(date($date_begin_correct_format->format("Y-m-d"), mktime()) . " + ".$day_to_add . " day"));
+	$date_to_implement = date('Y-m-d',strtotime(date($date_begin_correct_format->format("Y-m-d"), time()) . " + ".$day_to_add . " day"));
 		$sales = get_fullpricing($date_to_implement, '');
 		$profit = get_profit($date_to_implement, '');
 		echo "['".date('D',strtotime($date_to_implement)). "', ".$sales.", ".$profit.", 0],";
@@ -378,7 +620,7 @@ foreach($countries as $country) {
 		  <?php
 
 for ($day_to_add = 0; $day_to_add < 7; $day_to_add++) {
-	$date_to_implement = date('Y-m-d',strtotime(date($date_begin_correct_format->format("Y-m-d"), mktime()) . " + ".$day_to_add . " day"));
+	$date_to_implement = date('Y-m-d',strtotime(date($date_begin_correct_format->format("Y-m-d"), time()) . " + ".$day_to_add . " day"));
 		$sales = get_fullpricing($date_to_implement, $country['countrycode']);
 		$profit = get_profit($date_to_implement, $country['countrycode']);
 		echo "['".date('D',strtotime($date_to_implement)). "', ".$sales.", ".$profit.", 0],";
@@ -404,6 +646,45 @@ $(window).resize(function(){
 });	
 
     </script>
+	<script>
+	moreAboutFields("net_sales", "all", 0, 1);
+	moreAboutFields("logs", "all", 3, 5);
+	moreAboutFields("cogs", "all", 6, 8);
+	<?php 
+	$countries = get_countries_top_five($today_date);
+foreach($countries as $country) {
+?>
+	moreAboutFields("net_sales", "<?php echo $country['countrycode']; ?>", 0, 1);
+	moreAboutFields("logs", "<?php echo $country['countrycode']; ?>", 3, 5);
+	moreAboutFields("cogs", "<?php echo $country['countrycode']; ?>", 6, 8);
+<?php } ?>
+	
+	function moreAboutFields(name, country, id_begin, id_end) { 
+		$('#more_'+country+'_'+name+'').click(function(e) { 
+		$('#more_'+country+'_'+name+'').attr('src', 'img/icon/less.png');
+		$('#more_'+country+'_'+name+'').attr('id', 'less_'+country+'_'+name+'');
+			for (var i = id_begin; i <= id_end; i++) {  
+			$('#'+i+'_'+country+'_country').css('display', '');
+			}
+			lessAboutFields(name, country, id_begin, id_end);
+		});
+	
+	}
+	function lessAboutFields(name, country, id_begin, id_end) { 
+		$('#less_'+country+'_'+name+'').click(function(e) { 
+		$('#less_'+country+'_'+name+'').attr('src', 'img/icon/more.png');
+		$('#less_'+country+'_'+name+'').attr('id', 'more_'+country+'_'+name+'');
+			for (var i = id_begin; i <= id_end; i++) {
+			$('#'+i+'_'+country+'_country').css('display', 'none');
+			}		
+			moreAboutFields(name, country, id_begin, id_end);
+		});
+
+	}
+	
+
+	</script>
+	
 
 	<!-- END ploting -->
     <!-- Bootstrap Core JavaScript -->
