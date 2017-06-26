@@ -4,7 +4,7 @@ require_once("keychain.php"); // contains the passwords we need
 function makemultiqueriesforps($query) {
 
 try{	
-$db_conn = mysqli_connect(DBLPS, DBPS_USER, DBPS_PASS, DBPS_DATABASE);
+$db_conn = mysqli_connect(DBLPS_HOST, DBLPS_USER, DBLPS_PASS, DBLPS_DATABASE);
  
 mysqli_query($db_conn, "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'");
 
@@ -20,7 +20,7 @@ return $result;
 function makequeryforps($query){
 
 try {
-	$db_conn = new PDO('mysql:host='.DBLPS.';dbname='.DBPS_DATABASE.';charset=utf8', DBPS_USER, DBPS_PASS); 
+	$db_conn = new PDO('mysql:host='.DBLPS_HOST.';dbname='.DBLPS_DATABASE.';charset=utf8', DBLPS_USER, DBLPS_PASS); 
 	
 
 $result = $db_conn->prepare($query);
@@ -57,7 +57,7 @@ makemultiqueriesforps(select_gateways_and_insertin_temp_gateways());
 	$query = "
 (
 SELECT c.iso_code, 
-(sum(o.total_paid_tax_incl)/(1+".IVA."/100)) as 'Full Pricing',
+(sum((o.total_paid_tax_incl+(o.total_discounts_tax_incl)-o.total_shipping_tax_incl))/(1+".IVA."/100)) as 'Full Pricing',
 sum(order_detail_summarized.sales_discount) as 'sales_discount',  
 sum(o.total_discounts_tax_incl/(1+".IVA."/100)) as 'coupon discount', 
 sum(order_detail_summarized.cogs) as 'cogs',
@@ -294,7 +294,7 @@ from
 			ts.weight AS 'weight temp', 
 			temp_select.weight AS 'real weight',
 			ts.price AS 'price', 
-			(ts.price*(1+tes.percentage/100) + tes.fix) AS 'majoreted'
+			(ts.price + tes.fix)*(1+tes.percentage/100) AS 'majoreted'
 
 
 			 FROM (
@@ -343,7 +343,7 @@ from
 			ts.weight AS 'weight temp', 
 			temp_select.weight AS 'real weight',
 			ts.price AS 'price', 
-			(ts.price*(1+tes.percentage/100) + tes.fix) AS 'majoreted'
+			(ts.price + tes.fix)*(1+tes.percentage/100) AS 'majoreted'
 
 
 			 FROM (

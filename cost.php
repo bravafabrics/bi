@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="lib/simple-line-icons/css/simple-line-icons.css">
     <link rel="stylesheet" href="lib/device-mockups/device-mockups.min.css">
+	<link rel="icon" href="img/icon/cloud.png">
 
     <!-- Theme CSS -->
     <link href="css/new-age.min.css" rel="stylesheet">
